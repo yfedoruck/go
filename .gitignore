@@ -2,4 +2,4 @@
 /bin
 /pkg
 .idea
-!/github.com/user/
+!/src/github.com/user/
