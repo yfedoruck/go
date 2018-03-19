@@ -1,5 +1,8 @@
-/*
 /bin
 /pkg
 .idea
-!/src/github.com/user/
+!src/github.com/user/
+src/github.com/pkg/
+src/github.com/go-gl/
+src/github.com/faiface/
+src/golang.org/
