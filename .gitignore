@@ -5,4 +5,4 @@
 src/github.com/pkg/
 src/github.com/go-gl/
 src/github.com/faiface/
-src/golang.org/
+/src/golang.org/
