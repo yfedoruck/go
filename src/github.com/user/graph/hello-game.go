@@ -8,7 +8,23 @@ import (
     "github.com/faiface/pixel"
     _ "golang.org/x/image/colornames"
     "golang.org/x/image/colornames"
+    "os"
+    "image"
+    _ "image/png"
 )
+
+func loadPicture(path string) (pixel.Picture, error) {
+    file, err := os.Open(path)
+    if err != nil {
+        return nil, err
+    }
+    defer file.Close()
+    img, _, err := image.Decode(file)
+    if err != nil {
+        return nil, err
+    }
+    return pixel.PictureDataFromImage(img), nil
+}
 
 func run() {
     cfg := pixelgl.WindowConfig{
@@ -21,7 +37,13 @@ func run() {
         panic(err)
     }
 
-    win.Clear(colornames.Darkgrey)
+    pic, err := loadPicture("vim-go.png")
+    if err != nil {
+        panic(err)
+    }
+    sprite := pixel.NewSprite(pic, pic.Bounds())
+    win.Clear(colornames.Greenyellow)
+    sprite.Draw(win, pixel.IM.Moved(win.Bounds().Center()))
 
     for !win.Closed() {
         win.Update()
