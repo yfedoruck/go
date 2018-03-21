@@ -44,4 +44,49 @@ func main() {
     figure.IncreaseHeight(5)
     figure.IncreaseWidth(10)
     fmt.Println(figure.Square())
+
+    var arr [5]int
+    var ii int
+    var j int
+    j = 4
+    fmt.Println(arr, ii, j)
+    //arr[0] = 1
+    //arr2 := [5]int{1, 2, 3}
+    //fmt.Println(arr2, arr)
+
+    var qq [4]int
+    ww := [4]int{}
+    fmt.Println(qq, ww)
+
+    primes := [5]int{1, 2, 3, 5, 7}
+    fmt.Println(primes[4])
+
+    sl := primes[1:3]
+    fmt.Println(sl)
+
+
+
+    t := make(map[string]int)
+    t["a"] = 3
+    t["b"] = 5
+    t["c"] = 7777777
+
+    t["c"] = 8888
+    //delete(t, "c")
+
+    fmt.Println(t)
+    fmt.Println(
+        t["b"],
+        t["c"],
+        t["CCCSdf"],
+        t["d  v"],
+    )
+
+    el, ok := t["aa"]
+    fmt.Println(el, ok)
+
+
+
+
+
 }

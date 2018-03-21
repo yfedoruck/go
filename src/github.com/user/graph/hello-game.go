@@ -1,55 +1,65 @@
 package main
 
 import (
-    _ "io"
-    _ "strings"
-    _ "github.com/faiface/pixel"
-    "github.com/faiface/pixel/pixelgl"
-    "github.com/faiface/pixel"
-    _ "golang.org/x/image/colornames"
-    "golang.org/x/image/colornames"
-    "os"
-    "image"
-    _ "image/png"
+	"image"
+
+	_ "image/png"
+	_ "io"
+	"math"
+	"os"
+	_ "strings"
+
+	"github.com/faiface/pixel"
+	_ "github.com/faiface/pixel"
+	"github.com/faiface/pixel/pixelgl"
+	"golang.org/x/image/colornames"
+	_ "golang.org/x/image/colornames"
 )
 
 func loadPicture(path string) (pixel.Picture, error) {
-    file, err := os.Open(path)
-    if err != nil {
-        return nil, err
-    }
-    defer file.Close()
-    img, _, err := image.Decode(file)
-    if err != nil {
-        return nil, err
-    }
-    return pixel.PictureDataFromImage(img), nil
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	img, _, err := image.Decode(file)
+	if err != nil {
+		return nil, err
+	}
+	return pixel.PictureDataFromImage(img), nil
 }
 
 func run() {
-    cfg := pixelgl.WindowConfig{
-        Title:  "Pixel Rocks!",
-        Bounds: pixel.R(0, 0, 1024, 768),
-        VSync:  true,
-    }
-    win, err := pixelgl.NewWindow(cfg)
-    if err != nil {
-        panic(err)
-    }
+	var _ = math.Pi
 
-    pic, err := loadPicture("vim-go.png")
-    if err != nil {
-        panic(err)
-    }
-    sprite := pixel.NewSprite(pic, pic.Bounds())
-    win.Clear(colornames.Greenyellow)
-    sprite.Draw(win, pixel.IM.Moved(win.Bounds().Center()))
+	cfg := pixelgl.WindowConfig{
+		Title:  "Pixel Rocks!",
+		Bounds: pixel.R(0, 0, 1024, 768),
+		VSync:  true,
+	}
+	win, err := pixelgl.NewWindow(cfg)
+	if err != nil {
+		panic(err)
+	}
+	win.SetSmooth(true)
 
-    for !win.Closed() {
-        win.Update()
-    }
+	pic, err := loadPicture("picture.png")
+	if err != nil {
+		panic(err)
+	}
+
+	sprite := pixel.NewSprite(pic, pic.Bounds())
+	win.Clear(colornames.Black)
+	mat := pixel.IM
+	mat = mat.Moved(win.Bounds().Center())
+	//mat = mat.Rotated(win.Bounds().Center(), math.Pi/4)
+	mat = mat.ScaledXY(win.Bounds().Center(), pixel.V(0.5, 2))
+	sprite.Draw(win, mat)
+	for !win.Closed() {
+		win.Update()
+	}
 }
 
 func main() {
-    pixelgl.Run(run)
+	pixelgl.Run(run)
 }
