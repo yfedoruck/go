@@ -50,12 +50,17 @@ func run() {
 
 	sprite := pixel.NewSprite(pic, pic.Bounds())
 	win.Clear(colornames.Black)
-	mat := pixel.IM
-	mat = mat.Moved(win.Bounds().Center())
-	//mat = mat.Rotated(win.Bounds().Center(), math.Pi/4)
-	mat = mat.ScaledXY(win.Bounds().Center(), pixel.V(0.5, 2))
-	sprite.Draw(win, mat)
+
+	angle := 0.0
 	for !win.Closed() {
+		angle += 0.5
+
+		mat := pixel.IM
+		mat = mat.Moved(win.Bounds().Center())
+		mat = mat.Rotated(pixel.ZV, angle)
+		mat = mat.ScaledXY(win.Bounds().Center(), pixel.V(0.5, 2))
+		sprite.Draw(win, mat)
+
 		win.Update()
 	}
 }
