@@ -1,5 +1,8 @@
 /bin
 /pkg
 .idea
+!/src/
 /src/*
-!src/github.com/user/
+!/src/github.com/
+/src/github.com/*
+!/src/github.com/user/
