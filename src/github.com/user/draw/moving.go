@@ -9,7 +9,7 @@ import (
 	"golang.org/x/image/colornames"
 )
 
-func run() {
+func moveCircle() {
 	cfg := pixelgl.WindowConfig{
 		Title:  "Pixel Rocks!",
 		Bounds: pixel.R(0, 0, 1024, 768),
@@ -39,8 +39,4 @@ func run() {
 		imd.Draw(win)
 		win.Update()
 	}
-}
-
-func main() {
-	pixelgl.Run(run)
 }
