@@ -85,6 +85,7 @@ func setLine(line *pixel.Vec, length float64, field Rect, radius float64) {
 
 	if line.Y+length >= field.rectY1 {
 		line.Y = field.rectY0 + radius
+		length = 0.0
 	} else {
 		line.Y += length
 	}
