@@ -23,20 +23,22 @@ func run() {
 	length := 0.0
 	last := time.Now()
 	for !win.Closed() {
+		win.Clear(colornames.Black)
+
 		dt := time.Since(last).Seconds()
 		last = time.Now()
 		length += 20 * dt
 
-		imd := imdraw.New(nil)
-		imd.Color = colornames.Darkgray
 		line := pixel.V(100, 100)
 		line.X += length
 		line.Y += length
+
+		imd := imdraw.New(nil)
+		imd.Color = colornames.Darkgray
 		imd.Push(line)
 		imd.Circle(10, 1)
-
-		win.Clear(colornames.Black)
 		imd.Draw(win)
+
 		win.Update()
 	}
 }
