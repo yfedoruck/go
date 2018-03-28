@@ -45,14 +45,26 @@ func run() {
 
 		dt := time.Since(last).Seconds()
 		last = time.Now()
-		length += 100 * dt
-
 		radius := 20.0
 
 		line := pixel.V(field.rectX0+radius, field.rectY0+radius)
-		//line.X += length
-		//line.Y += length
-		setLine(&line, length, field, radius)
+
+		//setLine(&line, length, field, radius)
+		if line.X+length >= field.rectX1 {
+			line.X = field.rectX0 + radius
+			length = 0.0
+		} else {
+			length += 100 * dt
+			line.X += length
+		}
+
+		if line.Y+length >= field.rectY1 {
+			line.Y = field.rectY0 + radius
+			length = 0.0
+		} else {
+			length += 100 * dt
+			line.Y += length
+		}
 
 		circle(line, win, radius)
 
