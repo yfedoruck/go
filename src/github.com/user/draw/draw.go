@@ -9,10 +9,28 @@ import (
 	"golang.org/x/image/colornames"
 )
 
+type Rect struct {
+	rectX0,
+	rectY0,
+	rectX1,
+	rectY1 float64
+}
+
 func run() {
+
+	winX := 1.3 * 1024.0
+	winY := 1.3 * 768.0
+
+	field := Rect{
+		rectX0: winX / 4,
+		rectY0: winY / 4,
+		rectX1: 3 * winX / 4,
+		rectY1: 3 * winY / 4,
+	}
+
 	cfg := pixelgl.WindowConfig{
 		Title:  "Pixel Rocks!",
-		Bounds: pixel.R(0, 0, 1024, 768),
+		Bounds: pixel.R(0, 0, winX, winY),
 		VSync:  true,
 	}
 	win, err := pixelgl.NewWindow(cfg)
@@ -27,19 +45,48 @@ func run() {
 
 		dt := time.Since(last).Seconds()
 		last = time.Now()
-		length += 20 * dt
+		length += 100 * dt
 
-		line := pixel.V(100, 100)
-		line.X += length
-		line.Y += length
+		radius := 20.0
+
+		line := pixel.V(field.rectX0+radius, field.rectY0+radius)
+		//line.X += length
+		//line.Y += length
+		setLine(&line, length, field, radius)
+
+		circle(line, win, radius)
 
 		imd := imdraw.New(nil)
-		imd.Color = colornames.Darkgray
-		imd.Push(line)
-		imd.Circle(10, 1)
+
+		imd.Color = colornames.Blueviolet
+		imd.Push(pixel.V(field.rectX0, field.rectY0), pixel.V(field.rectX1, field.rectY1))
+		imd.Rectangle(1)
+
 		imd.Draw(win)
 
 		win.Update()
+	}
+}
+
+func circle(line pixel.Vec, win *pixelgl.Window, radius float64) {
+	imd := imdraw.New(nil)
+	imd.Color = colornames.Darkgray
+	imd.Push(line)
+	imd.Circle(radius, 0)
+	imd.Draw(win)
+}
+
+func setLine(line *pixel.Vec, length float64, field Rect, radius float64) {
+	if line.X+length >= field.rectX1 {
+		line.X = field.rectX0 + radius
+	} else {
+		line.X += length
+	}
+
+	if line.Y+length >= field.rectY1 {
+		line.Y = field.rectY0 + radius
+	} else {
+		line.Y += length
 	}
 }
 
