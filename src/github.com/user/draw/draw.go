@@ -23,6 +23,14 @@ func (r *Rect) vertical() float64 {
 	return r.rectY1 - r.rectY0
 }
 
+func (r *Rect) safeVertical(radius float64) float64 {
+	return r.vertical() - 2*radius
+}
+
+func (r *Rect) safeHorizontal(radius float64) float64 {
+	return r.horizontal() - 2*radius
+}
+
 func run() {
 
 	winX := 1.3 * 1024.0
@@ -56,8 +64,8 @@ func run() {
 	line := pixel.V(field.rectX0+radius, lineY0)
 	last := time.Now()
 
-	safeVertical := field.vertical() - 2*radius
-	safeHorizontal := field.horizontal() - 2*radius
+	safeVertical := field.safeVertical(radius)
+	safeHorizontal := field.safeHorizontal(radius)
 
 	for !win.Closed() {
 		win.Clear(colornames.Black)
@@ -87,9 +95,9 @@ func run() {
 		lengthX += dt
 		lengthY += dt
 
-		circle(line, win, radius)
-
 		imd := imdraw.New(nil)
+
+		circle(line, imd, radius)
 
 		imd.Color = colornames.Blueviolet
 		imd.Push(pixel.V(field.rectX0, field.rectY0), pixel.V(field.rectX1, field.rectY1))
@@ -101,12 +109,38 @@ func run() {
 	}
 }
 
-func circle(line pixel.Vec, win *pixelgl.Window, radius float64) {
-	imd := imdraw.New(nil)
+type Moving struct {
+	line                                                               *pixel.Vec
+	lengthX, lengthY, safeHorizontal, safeVertical, dt, lineX0, lineY0 float64
+}
+
+func (args Moving) run() {
+	if args.lengthX >= 2*args.safeHorizontal {
+		args.lengthX = 0.0
+	}
+	if args.lengthX >= args.safeHorizontal {
+		args.line.X -= args.dt
+	} else {
+		args.line.X = args.lineX0 + args.lengthX
+	}
+
+	if args.lengthY >= 2*args.safeVertical {
+		args.lengthY = 0.0
+	}
+	if args.lengthY >= args.safeVertical {
+		args.line.Y -= args.dt
+	} else {
+		args.line.Y = args.lineY0 + args.lengthY
+	}
+
+	args.lengthX += args.dt
+	args.lengthY += args.dt
+}
+
+func circle(line pixel.Vec, imd *imdraw.IMDraw, radius float64) {
 	imd.Color = colornames.Darkgray
 	imd.Push(line)
 	imd.Circle(radius, 0)
-	imd.Draw(win)
 }
 
 func setLine(line *pixel.Vec, length float64, field Rect, radius float64) {
