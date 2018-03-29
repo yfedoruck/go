@@ -16,6 +16,13 @@ type Rect struct {
 	rectY1 float64
 }
 
+func (r *Rect) horizontal() float64 {
+	return r.rectX1 - r.rectX0
+}
+func (r *Rect) vertical() float64 {
+	return r.rectY1 - r.rectY0
+}
+
 func run() {
 
 	winX := 1.3 * 1024.0
@@ -39,32 +46,37 @@ func run() {
 	}
 
 	length := 0.0
+	radius := 20.0
+	lineY0 := field.rectY0 + radius
+	line := pixel.V(field.rectX0+radius, lineY0)
 	last := time.Now()
+
 	for !win.Closed() {
 		win.Clear(colornames.Black)
 
-		dt := time.Since(last).Seconds()
-		last = time.Now()
-		radius := 20.0
+		dt := time.Since(last).Seconds() * 300
 
-		line := pixel.V(field.rectX0+radius, field.rectY0+radius)
+		//fmt.Println(dt)
+		last = time.Now()
+		//line := pixel.V(field.rectX0+radius, field.rectY0+radius)
 
 		//setLine(&line, length, field, radius)
-		if line.X+length >= field.rectX1 {
-			line.X = field.rectX0 + radius
+		//if line.X+length >= field.rectX1 {
+		//	line.X = field.rectX0 + radius
+		//} else {
+		//	line.X += length
+		//}
+
+		if length >= 2*field.vertical() {
 			length = 0.0
-		} else {
-			length += 100 * dt
-			line.X += length
 		}
 
-		if line.Y+length >= field.rectY1 {
-			line.Y = field.rectY0 + radius
-			length = 0.0
+		if (length >= field.vertical()) && (length < 2*field.vertical()) {
+			line.Y -= dt
 		} else {
-			length += 100 * dt
-			line.Y += length
+			line.Y = lineY0 + length
 		}
+		length += dt
 
 		circle(line, win, radius)
 
