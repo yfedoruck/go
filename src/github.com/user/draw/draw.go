@@ -69,34 +69,13 @@ func run() {
 
 	for !win.Closed() {
 		win.Clear(colornames.Black)
-
-		dt := time.Since(last).Seconds() * 100
-
+		dt := time.Since(last).Seconds() * 300
 		last = time.Now()
 
-		if lengthX >= 2*safeHorizontal {
-			lengthX = 0.0
-		}
-		if lengthX >= safeHorizontal {
-			line.X -= dt
-		} else {
-			line.X = lineX0 + lengthX
-		}
-
-		if lengthY >= 2*safeVertical {
-			lengthY = 0.0
-		}
-		if lengthY >= safeVertical {
-			line.Y -= dt
-		} else {
-			line.Y = lineY0 + lengthY
-		}
-
-		lengthX += dt
-		lengthY += dt
+		lengthX = run2(&line, lengthX, safeHorizontal, dt, lineX0, "X")
+		lengthY = run2(&line, lengthY, safeVertical, dt, lineY0, "Y")
 
 		imd := imdraw.New(nil)
-
 		circle(line, imd, radius)
 
 		imd.Color = colornames.Blueviolet
@@ -109,32 +88,52 @@ func run() {
 	}
 }
 
-type Moving struct {
-	line                                                               *pixel.Vec
-	lengthX, lengthY, safeHorizontal, safeVertical, dt, lineX0, lineY0 float64
+func run2(vector *pixel.Vec, lengthD, safeLength, delta, lineD0 float64, axis string) float64 {
+	if lengthD >= 2*safeLength {
+		lengthD = 0.0
+	}
+	if lengthD >= safeLength {
+		if axis == "X" {
+			vector.X -= delta
+		} else {
+			vector.Y -= delta
+		}
+	} else {
+		if axis == "X" {
+			vector.X = lineD0 + lengthD
+		} else {
+			vector.Y = lineD0 + lengthD
+		}
+	}
+
+	lengthD += delta
+
+	return lengthD
 }
 
-func (args Moving) run() {
-	if args.lengthX >= 2*args.safeHorizontal {
-		args.lengthX = 0.0
+type Moving struct {
+	vector                             pixel.Vec
+	lengthD, safeLength, delta, lineD0 float64
+	axis                               string
+}
+
+func (a Moving) run() (float64, pixel.Vec) {
+	if a.lengthD >= 2*a.safeLength {
+		a.lengthD = 0.0
 	}
-	if args.lengthX >= args.safeHorizontal {
-		args.line.X -= args.dt
+	if a.lengthD >= a.safeLength {
+		if a.axis == "X" {
+			a.vector.X -= a.delta
+		} else {
+			a.vector.Y -= a.delta
+		}
 	} else {
-		args.line.X = args.lineX0 + args.lengthX
+		a.vector.X = a.lineD0 + a.lengthD
 	}
 
-	if args.lengthY >= 2*args.safeVertical {
-		args.lengthY = 0.0
-	}
-	if args.lengthY >= args.safeVertical {
-		args.line.Y -= args.dt
-	} else {
-		args.line.Y = args.lineY0 + args.lengthY
-	}
+	a.lengthD += a.delta
 
-	args.lengthX += args.dt
-	args.lengthY += args.dt
+	return a.lengthD, a.vector
 }
 
 func circle(line pixel.Vec, imd *imdraw.IMDraw, radius float64) {
