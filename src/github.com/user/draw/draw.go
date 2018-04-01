@@ -61,7 +61,7 @@ func run() {
 	lengthY := 0.0
 	lineY0 := field.rectY0 + radius
 
-	line := pixel.V(field.rectX0+radius, lineY0)
+	line := pixel.V(lineX0, lineY0)
 	last := time.Now()
 
 	safeVertical := field.safeVertical(radius)
