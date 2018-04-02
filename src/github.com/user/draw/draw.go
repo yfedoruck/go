@@ -55,31 +55,21 @@ func run() {
 
 	radius := 120.0
 
-	lengthX := 0.0
-
-	//startDx := 50.0
-	//startDy := 50.0
-
-	//lineX0 := field.rectX0 + radius + startDx
 	lineX0 := field.rectX0 + radius
 
-	lengthY := 0.0
-	//lineY0 := field.rectY0 + radius + startDy
 	lineY0 := field.rectY0 + radius
 
 	line := pixel.V(lineX0, lineY0)
 	last := time.Now()
 
-	safeVertical := field.safeVertical(radius)
-	safeHorizontal := field.safeHorizontal(radius)
+	direct := Direction{true, true}
 
 	for !win.Closed() {
 		win.Clear(colornames.Black)
 		dt := time.Since(last).Seconds() * 300
 		last = time.Now()
 
-		lengthX = run2(&line.X, lengthX, safeHorizontal, dt, lineX0)
-		lengthY = run2(&line.Y, lengthY, safeVertical, dt, lineY0)
+		line = run3(line, field, &direct, dt, radius)
 
 		imd := imdraw.New(nil)
 		circle(line, imd, radius)
@@ -92,6 +82,49 @@ func run() {
 
 		win.Update()
 	}
+}
+
+type Direction struct {
+	X, Y bool
+}
+
+func run3(vector pixel.Vec, rec Rect, dir *Direction, delta float64, radius float64) pixel.Vec {
+
+	// X - axis
+	if dir.X == true {
+		vector.X += delta
+	} else {
+		vector.X -= delta
+	}
+
+	if vector.X <= rec.rectX0+radius {
+		vector.X = rec.rectX0 + radius
+		dir.X = true
+	}
+
+	if vector.X >= rec.rectX1-radius {
+		vector.X = rec.rectX1 - radius
+		dir.X = false
+	}
+
+	// Y - axis
+	if dir.Y == true {
+		vector.Y += delta
+	} else {
+		vector.Y -= delta
+	}
+
+	if vector.Y <= rec.rectY0+radius {
+		vector.Y = rec.rectY0 + radius
+		dir.Y = true
+	}
+
+	if vector.Y >= rec.rectY1-radius {
+		vector.Y = rec.rectY1 - radius
+		dir.Y = false
+	}
+
+	return vector
 }
 
 func run2(vectorAxis *float64, lengthD, safeLength, delta, lineD0 float64) float64 {
