@@ -56,9 +56,15 @@ func run() {
 	radius := 120.0
 
 	lengthX := 0.0
+
+	//startDx := 50.0
+	//startDy := 50.0
+
+	//lineX0 := field.rectX0 + radius + startDx
 	lineX0 := field.rectX0 + radius
 
 	lengthY := 0.0
+	//lineY0 := field.rectY0 + radius + startDy
 	lineY0 := field.rectY0 + radius
 
 	line := pixel.V(lineX0, lineY0)
