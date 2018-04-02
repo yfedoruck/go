@@ -78,8 +78,8 @@ func run() {
 		dt := time.Since(last).Seconds() * 300
 		last = time.Now()
 
-		lengthX = run2(&line, lengthX, safeHorizontal, dt, lineX0, "X")
-		lengthY = run2(&line, lengthY, safeVertical, dt, lineY0, "Y")
+		lengthX = run2(&line.X, lengthX, safeHorizontal, dt, lineX0)
+		lengthY = run2(&line.Y, lengthY, safeVertical, dt, lineY0)
 
 		imd := imdraw.New(nil)
 		circle(line, imd, radius)
@@ -94,22 +94,14 @@ func run() {
 	}
 }
 
-func run2(vector *pixel.Vec, lengthD, safeLength, delta, lineD0 float64, axis string) float64 {
+func run2(vectorAxis *float64, lengthD, safeLength, delta, lineD0 float64) float64 {
 	if lengthD >= 2*safeLength {
 		lengthD = 0.0
 	}
 	if lengthD >= safeLength {
-		if axis == "X" {
-			vector.X -= delta
-		} else {
-			vector.Y -= delta
-		}
+		*vectorAxis -= delta
 	} else {
-		if axis == "X" {
-			vector.X = lineD0 + lengthD
-		} else {
-			vector.Y = lineD0 + lengthD
-		}
+		*vectorAxis = lineD0 + lengthD
 	}
 
 	lengthD += delta
