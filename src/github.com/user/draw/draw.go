@@ -68,15 +68,16 @@ func run() {
 	for !win.Closed() {
 
 		win.Clear(colornames.Black)
-		dt := time.Since(last).Seconds() * 300
-		last = time.Now()
 
 		imd := imdraw.New(nil)
 
 		for i := 0; i < 5; i++ {
+			dt := time.Since(last).Seconds() * circles[i].velocity
 			circles[i].move(dt)
 			circles[i].draw(imd)
 		}
+
+		last = time.Now()
 
 		imd.Color = colornames.Blueviolet
 		imd.Push(pixel.V(field.rectX0, field.rectY0), pixel.V(field.rectX1, field.rectY1))
@@ -89,10 +90,11 @@ func run() {
 }
 
 type Circle struct {
-	line   pixel.Vec
-	direct Direction
-	radius float64
-	rec    *Rect
+	line     pixel.Vec
+	direct   Direction
+	radius   float64
+	rec      *Rect
+	velocity float64
 }
 
 func (c *Circle) build(rec *Rect) {
@@ -108,6 +110,7 @@ func (c *Circle) build(rec *Rect) {
 	}
 	c.radius = 20.0
 	c.rec = rec
+	c.velocity = float64(rand.Intn(500))
 }
 
 func (c *Circle) draw(imd *imdraw.IMDraw) {
