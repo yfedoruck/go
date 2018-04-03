@@ -57,7 +57,7 @@ func run() {
 
 	last := time.Now()
 
-	const count = 5
+	const count = 2
 
 	var circles [count]Circle
 	for i := 0; i < count; i++ {
@@ -100,6 +100,7 @@ type Circle struct {
 }
 
 func (c *Circle) build(rec *Rect) {
+	c.radius = 20.0
 
 	lineX0 := rec.rectX0 + c.radius + float64(rand.Intn(100))
 
@@ -110,7 +111,6 @@ func (c *Circle) build(rec *Rect) {
 		X: randomBool(),
 		Y: randomBool(),
 	}
-	c.radius = 20.0
 	c.rec = rec
 	c.velocity = float64(rand.Intn(500))
 }
