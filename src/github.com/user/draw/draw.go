@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/faiface/pixel"
@@ -53,26 +55,28 @@ func run() {
 		panic(err)
 	}
 
-	radius := 120.0
-
-	lineX0 := field.rectX0 + radius
-
-	lineY0 := field.rectY0 + radius
-
-	line := pixel.V(lineX0, lineY0)
 	last := time.Now()
 
-	direct := Direction{true, true}
+	var circles [5]Circle
+	for i := 0; i < 5; i++ {
+		circles[i] = Circle{}
+		circles[i].build(&field)
+	}
+
+	fmt.Println(circles)
 
 	for !win.Closed() {
+
 		win.Clear(colornames.Black)
 		dt := time.Since(last).Seconds() * 300
 		last = time.Now()
 
-		line = run3(line, field, &direct, dt, radius)
-
 		imd := imdraw.New(nil)
-		circle(line, imd, radius)
+
+		for i := 0; i < 5; i++ {
+			circles[i].move(dt)
+			circles[i].draw(imd)
+		}
 
 		imd.Color = colornames.Blueviolet
 		imd.Push(pixel.V(field.rectX0, field.rectY0), pixel.V(field.rectX1, field.rectY1))
@@ -84,11 +88,40 @@ func run() {
 	}
 }
 
-type Direction struct {
-	X, Y bool
+type Circle struct {
+	line   pixel.Vec
+	direct Direction
+	radius float64
+	rec    *Rect
 }
 
-func run3(vector pixel.Vec, rec Rect, dir *Direction, delta float64, radius float64) pixel.Vec {
+func (c *Circle) build(rec *Rect) {
+
+	lineX0 := rec.rectX0 + c.radius + float64(rand.Intn(100))
+
+	lineY0 := rec.rectY0 + c.radius + float64(rand.Intn(200))
+
+	c.line = pixel.V(lineX0, lineY0)
+	c.direct = Direction{
+		X: randomBool(),
+		Y: randomBool(),
+	}
+	c.radius = 20.0
+	c.rec = rec
+}
+
+func (c *Circle) draw(imd *imdraw.IMDraw) {
+	imd.Color = colornames.Darkgray
+	imd.Push(c.line)
+	imd.Circle(c.radius, 0)
+}
+
+func (c *Circle) move(delta float64) {
+
+	vector := &c.line
+	dir := &c.direct
+	radius := c.radius
+	rec := c.rec
 
 	// X - axis
 	if dir.X == true {
@@ -123,69 +156,25 @@ func run3(vector pixel.Vec, rec Rect, dir *Direction, delta float64, radius floa
 		vector.Y = rec.rectY1 - radius
 		dir.Y = false
 	}
-
-	return vector
 }
 
-func run2(vectorAxis *float64, lengthD, safeLength, delta, lineD0 float64) float64 {
-	if lengthD >= 2*safeLength {
-		lengthD = 0.0
-	}
-	if lengthD >= safeLength {
-		*vectorAxis -= delta
-	} else {
-		*vectorAxis = lineD0 + lengthD
-	}
-
-	lengthD += delta
-
-	return lengthD
+func random(min, max int) float64 {
+	rand.Seed(time.Now().Unix())
+	return float64(rand.Intn(max-min) + min)
 }
 
-type Moving struct {
-	vector                             pixel.Vec
-	lengthD, safeLength, delta, lineD0 float64
-	axis                               string
+func randomBool() bool {
+	return rand.Intn(2) == 0
 }
 
-func (a Moving) run() (float64, pixel.Vec) {
-	if a.lengthD >= 2*a.safeLength {
-		a.lengthD = 0.0
-	}
-	if a.lengthD >= a.safeLength {
-		if a.axis == "X" {
-			a.vector.X -= a.delta
-		} else {
-			a.vector.Y -= a.delta
-		}
-	} else {
-		a.vector.X = a.lineD0 + a.lengthD
-	}
-
-	a.lengthD += a.delta
-
-	return a.lengthD, a.vector
+type Direction struct {
+	X, Y bool
 }
 
 func circle(line pixel.Vec, imd *imdraw.IMDraw, radius float64) {
 	imd.Color = colornames.Darkgray
 	imd.Push(line)
 	imd.Circle(radius, 0)
-}
-
-func setLine(line *pixel.Vec, length float64, field Rect, radius float64) {
-	if line.X+length >= field.rectX1 {
-		line.X = field.rectX0 + radius
-	} else {
-		line.X += length
-	}
-
-	if line.Y+length >= field.rectY1 {
-		line.Y = field.rectY0 + radius
-		length = 0.0
-	} else {
-		line.Y += length
-	}
 }
 
 func main() {
