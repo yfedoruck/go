@@ -57,8 +57,10 @@ func run() {
 
 	last := time.Now()
 
-	var circles [5]Circle
-	for i := 0; i < 5; i++ {
+	const count = 5
+
+	var circles [count]Circle
+	for i := 0; i < count; i++ {
 		circles[i] = Circle{}
 		circles[i].build(&field)
 	}
@@ -71,7 +73,7 @@ func run() {
 
 		imd := imdraw.New(nil)
 
-		for i := 0; i < 5; i++ {
+		for i := 0; i < count; i++ {
 			dt := time.Since(last).Seconds() * circles[i].velocity
 			circles[i].move(dt)
 			circles[i].draw(imd)
