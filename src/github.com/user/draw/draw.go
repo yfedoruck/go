@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 
@@ -73,11 +74,19 @@ func run() {
 
 		imd := imdraw.New(nil)
 
-		for i := 0; i < count; i++ {
-			dt := time.Since(last).Seconds() * circles[i].velocity
-			circles[i].move(dt)
-			circles[i].draw(imd)
-		}
+		//for i := 0; i < count; i++ {
+		//	dt := time.Since(last).Seconds() * circles[i].velocity
+		//	circles[i].move(dt)
+		//	circles[i].draw(imd)
+		//}
+
+		dt0 := time.Since(last).Seconds() * circles[0].velocity
+		circles[0].move1(dt0, &circles[1])
+		circles[0].draw(imd)
+
+		dt1 := time.Since(last).Seconds() * circles[1].velocity
+		circles[1].move1(dt1, &circles[0])
+		circles[1].draw(imd)
 
 		last = time.Now()
 
@@ -100,7 +109,7 @@ type Circle struct {
 }
 
 func (c *Circle) build(rec *Rect) {
-	c.radius = 20.0
+	c.radius = 80.0
 
 	lineX0 := rec.rectX0 + c.radius + float64(rand.Intn(100))
 
@@ -119,6 +128,64 @@ func (c *Circle) draw(imd *imdraw.IMDraw) {
 	imd.Color = colornames.Darkgray
 	imd.Push(c.line)
 	imd.Circle(c.radius, 0)
+}
+
+func (c *Circle) move1(delta float64, cr *Circle) {
+
+	vector := &c.line
+	dir := &c.direct
+	radius := c.radius
+	rec := c.rec
+	velocity := c.velocity
+
+	if dir.X == true {
+		vector.X += delta
+	} else {
+		vector.X -= delta
+	}
+
+	if dir.Y == true {
+		vector.Y += delta
+	} else {
+		vector.Y -= delta
+	}
+
+	// X - axis
+	if vector.X <= rec.rectX0+radius {
+		vector.X = rec.rectX0 + radius
+		dir.X = true
+	}
+
+	if vector.X >= rec.rectX1-radius {
+		vector.X = rec.rectX1 - radius
+		dir.X = false
+	}
+
+	// Y - axis
+	if vector.Y <= rec.rectY0+radius {
+		vector.Y = rec.rectY0 + radius
+		dir.Y = true
+	}
+
+	if vector.Y >= rec.rectY1-radius {
+		vector.Y = rec.rectY1 - radius
+		dir.Y = false
+	}
+
+	length := math.Sqrt(math.Pow(vector.X-cr.line.X, 2) + math.Pow(vector.Y-cr.line.Y, 2))
+
+	if length <= 2*radius {
+		if velocity > cr.velocity {
+			dir.X = !dir.X
+			dir.Y = !dir.Y
+		}
+		//else {
+		//	cr.direct.X = !cr.direct.X
+		//	cr.direct.Y = !cr.direct.Y
+		//}
+	}
+
+	//fmt.Println(length)
 }
 
 func (c *Circle) move(delta float64) {
