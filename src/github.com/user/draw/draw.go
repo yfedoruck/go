@@ -63,7 +63,7 @@ func run() {
 	var circles [count]Circle
 	for i := 0; i < count; i++ {
 		circles[i] = Circle{}
-		circles[i].build(&field, float64(i+1))
+		circles[i].build(&field)
 	}
 
 	fmt.Println(circles)
@@ -108,12 +108,12 @@ type Circle struct {
 	velocity float64
 }
 
-func (c *Circle) build(rec *Rect, i float64) {
+func (c *Circle) build(rec *Rect) {
 	c.radius = 60.0
 
-	lineX0 := rec.rectX0 + i*2*c.radius + float64(rand.Intn(int(rec.rectX1-i*2*c.radius)))
+	lineX0 := rec.rectX0 + c.radius + float64(rand.Intn(int(rec.rectX1-c.radius)))
 
-	lineY0 := rec.rectY0 + i*2*c.radius + float64(rand.Intn(int(rec.rectY1-i*2*c.radius)))
+	lineY0 := rec.rectY0 + c.radius + float64(rand.Intn(int(rec.rectY1-c.radius)))
 
 	c.line = pixel.V(lineX0, lineY0)
 	c.direct = Direction{
@@ -175,14 +175,34 @@ func (c *Circle) move1(delta float64, cr *Circle) {
 
 	if length <= 2*radius {
 
-		if dir.X == cr.direct.X && dir.Y == cr.direct.Y {
-			dir.X = !dir.X
-			dir.Y = !dir.Y
-		} else if dir.X == cr.direct.X && dir.Y != cr.direct.Y {
-			dir.X = !dir.X
-		} else if dir.X != cr.direct.X && dir.Y == cr.direct.Y {
-			dir.Y = !dir.Y
-		} else if dir.X != cr.direct.X && dir.Y != cr.direct.Y {
+		//dx := math.Abs(vector.X - cr.line.X)
+
+		if vector.X > cr.line.X {
+			if dir.X == cr.direct.X {
+				cr.direct.X = !cr.direct.X
+			} else if dir.X == false {
+				dir.X = !dir.X
+			}
+		} else {
+			if dir.X == cr.direct.X {
+				dir.X = !dir.X
+			} else if cr.direct.X == false {
+				cr.direct.X = !cr.direct.X
+			}
+		}
+
+		if vector.Y > cr.line.Y {
+			if dir.Y == cr.direct.Y {
+				cr.direct.Y = !cr.direct.Y
+			} else if dir.Y == false {
+				dir.Y = !dir.Y
+			}
+		} else {
+			if dir.Y == cr.direct.Y {
+				dir.Y = !dir.Y
+			} else if cr.direct.Y == false {
+				cr.direct.Y = !cr.direct.Y
+			}
 		}
 	}
 }
