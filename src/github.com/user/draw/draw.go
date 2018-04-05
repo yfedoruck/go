@@ -58,7 +58,7 @@ func run() {
 
 	last := time.Now()
 
-	const count = 2
+	const count = 3
 
 	var circles [count]Circle
 	for i := 0; i < count; i++ {
@@ -74,19 +74,15 @@ func run() {
 
 		imd := imdraw.New(nil)
 
-		//for i := 0; i < count; i++ {
-		//	dt := time.Since(last).Seconds() * circles[i].velocity
-		//	circles[i].move(dt)
-		//	circles[i].draw(imd)
-		//}
-
-		dt0 := time.Since(last).Seconds() * circles[0].velocity
-		circles[0].move1(dt0, &circles[1])
-		circles[0].draw(imd)
-
-		dt1 := time.Since(last).Seconds() * circles[1].velocity
-		circles[1].move1(dt1, &circles[0])
-		circles[1].draw(imd)
+		for i := 0; i < count; i++ {
+			dt := time.Since(last).Seconds() * circles[i].velocity
+			next := i + 1
+			if next == count {
+				next = 0
+			}
+			circles[i].move1(dt, &circles[next])
+			circles[i].draw(imd)
+		}
 
 		last = time.Now()
 
