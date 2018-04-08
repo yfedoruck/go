@@ -11,8 +11,9 @@ func main() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
 
 	if err != nil {
-		log.Println(err)
+		log.Panicln(err)
 	}
+
 	defer g.Close()
 
 	g.SetManagerFunc(layout)
@@ -24,10 +25,12 @@ func main() {
 
 func layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
-	if v, err := g.SetView("hello", maxX/2-7, maxY/2, maxX/2+7, maxY/2+2); err != nil {
-		fmt.Println(v, "Hello world!")
+	v, err := g.SetView("hello", maxX/2-7, maxY/2, maxX/2+7, maxY/2+2)
 
+	if err == nil {
+		fmt.Fprintln(v, "Hello world!")
 	}
+
 	return nil
 }
 
