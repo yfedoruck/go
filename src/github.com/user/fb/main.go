@@ -3,23 +3,33 @@ package main
 import (
 	"fmt"
 
+	"os/exec"
+
 	ui "github.com/airking05/termui"
 	fb "github.com/huandu/facebook"
 )
 
 func main() {
-	tok := "EAACEdEose0cBAIoqCOBM00MdZAu2xZB3VZAD5qkLz1YjASIIg8O20ZBkjmtELG4k8KTQd0MGy5EFBWdTS69buVC8fZCvsJ6oyCsxpdM32u3JDsDvOTgDHj5L5eZCnndKutjYOeFD13gxzVky2M1vTyWiHoc0T6ix0pUT9UEkRDq5z4dtplcLzHHJNATcqcB78ZD"
-	res, _ := fb.Get("/831976246906620/feed", fb.Params{
-		"access_token": tok,
-	})
+	//tok := "EAACEdEose0cBAIoqCOBM00MdZAu2xZB3VZAD5qkLz1YjASIIg8O20ZBkjmtELG4k8KTQd0MGy5EFBWdTS69buVC8fZCvsJ6oyCsxpdM32u3JDsDvOTgDHj5L5eZCnndKutjYOeFD13gxzVky2M1vTyWiHoc0T6ix0pUT9UEkRDq5z4dtplcLzHHJNATcqcB78ZD"
+	//res, _ := fb.Get("/831976246906620/feed", fb.Params{
+	//	"access_token": tok,
+	//})
+
+	//git for-each-ref --format '%(refname:short)' refs/heads/
+
+	res1, _ := exec.Command("git", "branch").Output()
+	//fmt.Printf("%s", res1)
+	fmt.Print(string(res1))
+	//fmt.Print(res1)
+	return
 
 	var items []fb.Result
-	err := res.DecodeField("data", &items)
+	//err := res.DecodeField("data", &items)
 
-	if err != nil {
-		fmt.Printf("An error has happened %v", err)
-		return
-	}
+	//if err != nil {
+	//	fmt.Printf("An error has happened %v", err)
+	//	return
+	//}
 
 	//for _, item := range items {
 	//	fmt.Println(item["message"])
