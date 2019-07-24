@@ -9,28 +9,30 @@ import (
 
 func main() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
-
 	if err != nil {
 		log.Panicln(err)
 	}
-
 	defer g.Close()
 
 	g.SetManagerFunc(layout)
 
-	g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit)
-	g.MainLoop()
+	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
+		log.Panicln(err)
+	}
 
+	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+		log.Panicln(err)
+	}
 }
 
 func layout(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
-	v, err := g.SetView("hello", maxX/2-7, maxY/2, maxX/2+7, maxY/2+2)
-
-	if err == nil {
+	if v, err := g.SetView("hello", maxX/2-7, maxY/2, maxX/2+7, maxY/2+2); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
 		fmt.Fprintln(v, "Hello world!")
 	}
-
 	return nil
 }
 
