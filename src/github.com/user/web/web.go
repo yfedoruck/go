@@ -14,8 +14,9 @@ import (
 
 const (
 	DbUser     = "postgres"
-	DbPassword = "postgres"
+	DbPassword = "mysecretpassword"
 	DbName     = "test"
+	DbPort     = "10000"
 )
 
 func sayhelloName(w http.ResponseWriter, r *http.Request) {
@@ -64,12 +65,20 @@ func main() {
 func psql() {
 	fmt.Println("test123")
 
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", DbUser, DbPassword, DbName)
+	connStr := "postgres://%s:%s@localhost:%s/%s?sslmode=disable"
+	dbinfo := fmt.Sprintf(connStr, DbUser, DbPassword, DbPort, DbName)
+
 	db, err := sql.Open("postgres", dbinfo)
 	checkErr(err)
 	defer db.Close()
 
 	fmt.Println("# inserting values")
+
+	var lastInsertId int
+	err = db.QueryRow("INSERT INTO test_schema.userinfo(username,departname, created) VALUES($1,$2,$3) returning uid;", "astaxie", "研发部门", "2012-12-09").Scan(&lastInsertId)
+	checkErr(err)
+
+	fmt.Println("last insert id=", lastInsertId)
 
 }
 
