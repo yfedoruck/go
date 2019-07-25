@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 	tTemplate "text/template"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -80,6 +81,32 @@ func psql() {
 
 	fmt.Println("last insert id=", lastInsertId)
 
+	fmt.Println("# updating")
+	stmt, err := db.Prepare("update test_schema.userinfo set username=$1 where uid=$2")
+	checkErr(err)
+
+	res, err := stmt.Exec("astaxie_updated", lastInsertId)
+	checkErr(err)
+
+	affect, err := res.RowsAffected()
+	checkErr(err)
+
+	fmt.Println(affect, "Rows changed")
+	fmt.Println("# Querying")
+
+	rows, err := db.Query("select * from test_schema.userinfo")
+	checkErr(err)
+
+	for rows.Next() {
+		var uid int
+		var username string
+		var department string
+		var created time.Time
+		err = rows.Scan(&uid, &username, &department, &created)
+
+		fmt.Println("uid | username | department | created")
+		fmt.Printf("%3v | %18v | %6v | %6v\n", uid, username, department, created)
+	}
 }
 
 func checkErr(err error) {
